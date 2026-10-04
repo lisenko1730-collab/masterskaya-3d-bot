@@ -20,7 +20,5 @@ jobs:
           curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
             -F "chat_id=$TELEGRAM_TO" \
             -F "photo=https://images.unsplash.com/photo-1615840287214-7ff58936c4cf" \
-            -F "caption=🛠 **Новая модель напечатана!**
-            
-Качество отличное, пластик лег идеально. Ско скоро выложим файл для скачивания! 🚀" \
+            -F "caption=🛠 **Новая модель напечатана!** Качество отличное, пластик лег идеально. 🚀" \
             -F "parse_mode=Markdown"
