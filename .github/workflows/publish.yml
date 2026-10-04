@@ -2,22 +2,38 @@ name: Publish to Telegram Channel
 
 on:
   schedule:
-    - cron: '0 9 * * *'
+    - cron: '0 2 * * *'
   workflow_dispatch:
 
 jobs:
   send-post:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+  name: Publish to Telegram Channel
 
-      - name: Send photo to Telegram
-        env:
-          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_TO: "@master_3d_workshop"
-        run: |
-          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
-            -d "chat_id=$TELEGRAM_TO" \
-            -d "photo=https://images.unsplash.com/photo-1615840287214-7ff58936c4cf" \
-            -d "caption=Новая модель напечатана! Качество отличное, пластик лег идеально."
+  on:
+    schedule:
+      - cron: '0 2 * * *'
+    workflow_dispatch:
+
+  jobs:
+    send-post:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+
+        - name: Send photo to Telegram
+          env:
+            TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+            TELEGRAM_TO: "@master_3d_workshop"
+          run: |
+            curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
+              -d "chat_id=$TELEGRAM_TO" \
+              -d "photo=https://images.unsplash.com/photo-1615840287214-7ff58936c4cf" \
+              -d "parse_mode=Markdown" \
+              -d "caption=🚀 *Запускаем новое направление в нашей мастерской\!*
+
+  Друзья, мы постоянно развиваемся и осваиваем крутые технологичные новинки. Посмотрите на этот результат — гладкая текстура, идеальные линии и абсолютная прочность. 
+
+  🔥 Теперь мы можем воплощать в жизнь еще более сложные и необычные проекты. 
+
+  👇 *Как вам такая работа? Что бы вы хотели напечатать в рамках нашего нового направления? Пишите в комментариях\!*"
