@@ -1,9 +1,12 @@
 name: Publish to Telegram Channel
 
 on:
+  schedule:name: Publish to Telegram Channel
+
+on:
   schedule:
-    - cron: '0 9 * * *' # Публикация каждый день в 9:00 UTC
-  workflow_dispatch: # Ручной запуск из вкладки Actions
+    - cron: '0 9 * * *'
+  workflow_dispatch:
 
 jobs:
   send-post:
@@ -17,8 +20,20 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
         run: |
-          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
-            -F "chat_id=$TELEGRAM_TO" \
-            -F "photo=https://images.unsplash.com/photo-1615840287214-7ff58936c4cf" \
-            -F "caption=🛠 **Новая модель напечатана!** Качество отличное, пластик лег идеально. 🚀" \
-            -F "parse_mode=Markdown"
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" -F "chat_id=$TELEGRAM_TO" -F "photo=https://images.unsplash.com/photo-1615840287214-7ff58936c4cf" -F "caption=🛠 Новая модель напечатана! Качество отличное, пластик лег идеально. 🚀
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  send-post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Send photo to Telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: "@master_3d_workshop"
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" -F "chat_id=$TELEGRAM_TO" -F "photo=https://images.unsplash.com/photo-1615840287214-7ff58936c4cf" -F "caption=🛠 Новая модель напечатана! Качество отличное, пластик лег идеально. 🚀"
