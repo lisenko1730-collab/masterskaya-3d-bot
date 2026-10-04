@@ -17,9 +17,12 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
         run: |
+          RANDOM_ID=$((RANDOM % 1000))
+          PHOTO_URL="https://picsum.photos/seed/${RANDOM_ID}/1000/1000"
+
           curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
             -d "chat_id=$TELEGRAM_TO" \
-            -d "photo=https://images.unsplash.com/photo-1615840287214-7ff58936c4cf" \
+            -d "photo=$PHOTO_URL" \
             -d "parse_mode=Markdown" \
             -d "caption=🚀 *Запускаем новое направление в нашей мастерской\!*
 
