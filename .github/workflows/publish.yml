@@ -1,0 +1,22 @@
+name: Publish to Telegram Channel
+
+on:
+  schedule:
+    - cron: '0 9 * * *' # Публикация каждый день в 9:00 UTC
+  workflow_dispatch: # Позволяет запускать публикацию вручную из вкладки Actions
+
+jobs:
+  send-post:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Send message to Telegram
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_TO: "@masterskaya_3d" # Укажите юзернейм вашего канала
+        run: |
+          curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+            -d "chat_id=$TELEGRAM_TO" \
+            -d "text=🤖 Автоматический пост из Мастерской 3D: новая модель готова к печати!"
