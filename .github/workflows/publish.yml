@@ -1,18 +1,4 @@
-name: Publish to Telegram Channel
-
-on:
-  schedule:
-    - cron: '0 2 * * *'
-  workflow_dispatch:
-
-jobs:
-  send-post:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Send photo to Telegram
+- name: Send photo to Telegram
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
@@ -24,10 +10,8 @@ jobs:
             -d "chat_id=$TELEGRAM_TO" \
             -d "photo=$PHOTO_URL" \
             -d "parse_mode=Markdown" \
-            -d "caption=🚀 *Запускаем новое направление в нашей мастерской\!*
+            -d "caption=✨ *Вдохновение для новых проектов\!*
 
-          Друзья, мы постоянно развиваемся и осваиваем крутые технологичные новинки. Посмотрите на этот результат — гладкая текстура, идеальные линии и абсолютная прочность. 
+          Путь создания чего-то уникального начинается с идеи, но питается деталями вокруг нас. Каждая линия, каждый кадр и каждый поворот задают вектор для будущих 3D-моделей. 
 
-          🔥 Теперь мы можем воплощать в жизнь еще более сложные и необычные проекты. 
-
-          👇 *Как вам такая работа? Что бы вы хотели напечатать в рамках нашего нового направления? Пишите в комментариях\!*"
+          💡 *А что вдохновляет вас на творчество сегодня? Делитесь в комментариях\!*"
