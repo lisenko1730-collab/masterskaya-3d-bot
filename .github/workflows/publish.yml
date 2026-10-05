@@ -22,21 +22,21 @@ jobs:
           TREND_CHOICE=$(( (RANDOM % 15) + 1 ))
 
           case $TREND_CHOICE in
-            1) CAPTION="🔥 Тренд (PLA/PETG): Модульный органайзер для стола. [Открыть модель](https://www.printables.com/model/525695-ultimate-drawer-organizer) | Запускаем в печать?" ;;
-            2) CAPTION="🚀 Инженерка (TPU): Прочный чехол-бампер для телефона. [Открыть модель](https://www.thingiverse.com/thing:5188122) | Какая скорость под наш TPU?" ;;
-            3) CAPTION="⚙️ PETG: Силовая шестерня для механизма. [Открыть модель](https://www.printables.com/model/188452-strong-spur-gear) | Печатаем сразу из PETG?" ;;
-            4) CAPTION="🛠 Инженерка (PLA/PETG): Заглушка для карниза и крепление датчика. [Открыть модель](https://www.printables.com/model/298412) | Полезная фурнитура для дома?" ;;
-            5) CAPTION="🌿 Эко-декор (PLA): Стильное кашпо со сложными гранями. [Открыть модель](https://www.thingiverse.com/thing:2714481) | Пробуем эко-стиль?" ;;
-            6) CAPTION="🛡 TPU: Виброизоляционные демпферы под ножки принтера. [Открыть модель](https://www.thingiverse.com/thing:3249102) | Тестируем усадку на мягком?" ;;
-            7) CAPTION="💡 PLA: Геометрический подвесной абажур. [Открыть модель](https://www.printables.com/model/284102-geometric-lampshade) | Делаем линейку светильников?" ;;
-            8) CAPTION="🏢 PLA: Архитектурный макет панели здания. [Открыть модель](https://www.printables.com/model/394102-architectural-panel) | Есть выходы на архитекторов?" ;;
-            9) CAPTION="🚗 PETG: Автомобильный крючок-клипса в салон. [Открыть модель](https://www.thingiverse.com/thing:3948192) | Кому из водителей актуально?" ;;
-            10) CAPTION="🌱 PLA/PETG: Настенный держатель под роутер. [Открыть модель](https://www.printables.com/model/123984-wall-mount-router-holder) | Запустим серию?" ;;
-            11) CAPTION="🍳 PETG: Эргономичная подставка под крышки кастрюль. [Открыть модель](https://www.printables.com/model/198273-pot-lid-holder) | Какую проблему кухни решим?" ;;
+            1) CAPTION="🔥 Тренд (PLA/PETG): Модульный органайзер для рабочего стола. [Открыть модель](https://www.printables.com/model/525695-ultimate-drawer-organizer) | Запускаем в печать?" ;;
+            2) CAPTION="🚀 Инженерка (TPU): Гибкий и прочный защитный чехол. [Открыть модель](https://www.printables.com/model/481203-tpu-phone-bumper-case) | Какая скорость печати под наш TPU?" ;;
+            3) CAPTION="⚙️ PETG: Прочная силовая шестеренка для механизма. [Открыть модель](https://www.printables.com/model/188452-strong-spur-gear) | Печатаем сразу из PETG?" ;;
+            4) CAPTION="🛠 Инженерка (PLA/PETG): Заглушка для карниза и датчика умного дома. [Открыть модель](https://www.printables.com/model/298412-curtain-rail-plug-and-sensor-mount) | Полезная фурнитура?" ;;
+            5) CAPTION="🌿 Эко-декор (PLA): Стильное кашпо со сложными гранями. [Открыть модель](https://www.printables.com/model/451234-low-poly-planter) | Пробуем эко-стиль?" ;;
+            6) CAPTION="🛡 TPU: Виброизоляционные демпферы под ножки принтера. [Открыть модель](https://www.printables.com/model/324910-tpu-printer-feet-dampers) | Тестируем усадку на мягком?" ;;
+            7) CAPTION="💡 PLA: Геометрический подвесной абажур для светильника. [Открыть модель](https://www.printables.com/model/284102-geometric-lampshade) | Делаем линейку светильников?" ;;
+            8) CAPTION="🏢 PLA: Архитектурные панели и макетные элементы. [Открыть модель](https://www.printables.com/model/394102-architectural-wall-panel) | Есть выходы на архитекторов?" ;;
+            9) CAPTION="🚗 PETG: Автомобильный крючок-клипса для сумок в салон. [Открыть модель](https://www.printables.com/model/394819-car-headrest-hook) | Кому из водителей актуально?" ;;
+            10) CAPTION="🌱 PLA/PETG: Настенный эргономичный держатель для роутера. [Открыть модель](https://www.printables.com/model/123984-wall-mount-router-holder) | Запустим серию?" ;;
+            11) CAPTION="🍳 PETG: Подставка и организатор под крышки для кастрюль. [Открыть модель](https://www.printables.com/model/198273-pot-lid-holder) | Какую проблему кухни решим?" ;;
             12) CAPTION="🔧 PETG: Держатель под инструмент для перфопанели. [Открыть модель](https://www.printables.com/model/502819-pegboard-pliers-holder) | Переделываем стеллажи?" ;;
-            13) CAPTION="🐾 PLA: Двойная подставка под миски животных. [Открыть модель](https://www.thingiverse.com/thing:2847192) | У кого питомцы протестируют?" ;;
-            14) CAPTION="🎁 PLA/PETG: Брендированная визитница на стол. [Открыть модель](https://www.printables.com/model/319402-business-card-holder) | Делаем под заказ?" ;;
-            15) CAPTION="⚡️ PETG: Угловые мебельные крепежи высокой прочности. [Открыть модель](https://www.printables.com/model/419203-heavy-duty-corner-bracket) | Насколько востребовано?" ;;
+            13) CAPTION="🐾 PLA: Двойная приподнятая миска для домашних животных. [Открыть модель](https://www.printables.com/model/284719-elevated-pet-bowl-stand) | У кого питомцы протестируют?" ;;
+            14) CAPTION="🎁 PLA/PETG: Брендированная настольная подставка для визиток. [Открыть модель](https://www.printables.com/model/319402-business-card-holder) | Делаем под заказ?" ;;
+            15) CAPTION="⚡️ PETG: Угловые мебельные крепежи повышенной прочности. [Открыть модель](https://www.printables.com/model/419203-heavy-duty-corner-bracket) | Насколько востребовано?" ;;
           esac
 
           curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
