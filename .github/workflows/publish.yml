@@ -2,7 +2,7 @@ name: Publish to Telegram Channel
 
 on:
   schedule:
-    - cron: '*/30 6-20 * * *'
+    - cron: '*/30 2-15 * * *'
   workflow_dispatch:
 
 jobs:
@@ -24,7 +24,7 @@ jobs:
           case $TREND_CHOICE in
             1) CAPTION="🔥 Тренд (PLA/PETG): Модульный органайзер для рабочего стола. [Открыть модель](https://www.printables.com/model/525695-ultimate-drawer-organizer) | Запускаем в печать?" ;;
             2) CAPTION="🚀 Инженерка (TPU): Гибкий и прочный защитный чехол. [Открыть модель](https://www.printables.com/model/481203-tpu-phone-bumper-case) | Какая скорость печати под наш TPU?" ;;
-            3) CAPTION="⚙️ PETG: Прочная силовая шестеренка для механизма. [Открыть model](https://www.printables.com/model/188452-strong-spur-gear) | Печатаем сразу из PETG?" ;;
+            3) CAPTION="⚙️ PETG: Прочная силовая шестеренка для механизма. [Открыть модель](https://www.printables.com/model/188452-strong-spur-gear) | Печатаем сразу из PETG?" ;;
             4) CAPTION="🛠 Инженерка (PLA/PETG): Заглушка для карниза и датчика умного дома. [Открыть модель](https://www.printables.com/model/298412-curtain-rail-plug-and-sensor-mount) | Полезная фурнитура?" ;;
             5) CAPTION="🌿 Эко-декор (PLA): Стильное кашпо со сложными гранями. [Открыть модель](https://www.printables.com/model/451234-low-poly-planter) | Пробуем эко-стиль?" ;;
             6) CAPTION="🛡 TPU: Виброизоляционные демпферы под ножки принтера. [Открыть модель](https://www.printables.com/model/324910-tpu-printer-feet-dampers) | Тестируем усадку на мягком?" ;;
@@ -36,7 +36,7 @@ jobs:
             12) CAPTION="🔧 PETG: Держатель под инструмент для перфопанели. [Открыть модель](https://www.printables.com/model/502819-pegboard-pliers-holder) | Переделываем стеллажи?" ;;
             13) CAPTION="🐾 PLA: Двойная приподнятая миска для домашних животных. [Открыть модель](https://www.printables.com/model/284719-elevated-pet-bowl-stand) | У кого питомцы протестируют?" ;;
             14) CAPTION="🎁 PLA/PETG: Брендированная настольная подставка для визиток. [Открыть модель](https://www.printables.com/model/319402-business-card-holder) | Делаем под заказ?" ;;
-            15) CAPTION="⚡️ PETG: Угловые мебельные крепежи повышенной прочности. [Открыть модель](https://www.printables.com/model/419203-heavy-duty-corner-bracket) | Насколько востребовано?" ;;
+            15) CAPTION="⚡️️ PETG: Угловые мебельные крепежи повышенной прочности. [Открыть модель](https://www.printables.com/model/419203-heavy-duty-corner-bracket) | Насколько востребовано?" ;;
             16) CAPTION="💪 Бизнес-фокус: От хобби к цеху. Как нашей тройке превратить разовые заказы в поток серийного производства? Обсуждаем стратегию масштабирования!" ;;
             17) CAPTION="🎯 Инженерный рост: Каждая неудачная печать и отлипший слой — это не брак, а калибровка опыта. Какой сложный узел победим на этой неделе?" ;;
             18) CAPTION="🤝 Синергия команды: Один моделирует, второй настраивает термопрофиль, третий закрывает сбыт. Как распределим задачи для следующего крупного проекта?" ;;
