@@ -1,4 +1,4 @@
-name: Publish to Telegram Channel (Photo + Caption)
+name: Publish to Telegram Channel (Preview Card)
 
 on:
   schedule:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Send photo and caption to Telegram
+      - name: Send post to Telegram
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
@@ -28,22 +28,16 @@ jobs:
           PHOTO_URL=$(echo "$FIRST_LINE" | cut -d'|' -f1)
           CAPTION=$(echo "$FIRST_LINE" | cut -d'|' -f2-)
 
-          echo "Downloading image from: $PHOTO_URL"
-          # Добавили User-Agent, чтобы Unsplash не блокировал загрузку
-          curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "$PHOTO_URL" -o temp_image.jpg
+          # Собираем текст, где картинка идет в самом низу или вверху с описанием
+          FULL_TEXT="$CAPTION"$'\n\n'"$PHOTO_URL"
 
-          if [ ! -s "temp_image.jpg" ]; then
-            echo "ERROR: Failed to download image!"
-            exit 1
-          fi
+          echo "Publishing post..."
 
-          echo "Publishing post with photo..."
-
-          RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
-            -F "chat_id=$TELEGRAM_TO" \
-            -F "photo=@temp_image.jpg" \
-            -F "caption=$CAPTION" \
-            -F "parse_mode=Markdown")
+          RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
+            -d "chat_id=$TELEGRAM_TO" \
+            -d "parse_mode=Markdown" \
+            -d "disable_web_page_preview=false" \
+            -d "text=$FULL_TEXT")
 
           echo "Telegram Response: $RESPONSE"
           
