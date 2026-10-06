@@ -9,7 +9,7 @@ jobs:
   send-post:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Обязательно, чтобы скрипт мог сам удалять отправленный пост из файла и делать коммит
+      contents: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -24,10 +24,14 @@ jobs:
             exit 1
           fi
 
+          # Читаем первую строку
           FIRST_LINE=$(head -n 1 posts.txt)
-          PHOTO_URL="${FIRST_LINE%%|*}"
-          CAPTION="${FIRST_LINE#*|}"
+          
+          # Аккуратно разделяем ссылку и текст
+          PHOTO_URL=$(echo "$FIRST_LINE" | cut -d'|' -f1)
+          CAPTION=$(echo "$FIRST_LINE" | cut -d'|' -f2-)
 
+          echo "URL: $PHOTO_URL"
           echo "Publishing post..."
 
           RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
@@ -41,10 +45,10 @@ jobs:
           if echo "$RESPONSE" | grep -q '"ok":true'; then
             echo "Successfully sent to Telegram!"
             
-            # Удаляем первую строку из файла, чтобы она больше не повторялась
+            # Удаляем первую строку из файла
             sed -i '1d' posts.txt
             
-            # Сохраняем изменения обратно в репозиторий
+            # Сохраняем изменения в репозиторий
             git config --global user.name "github-actions[bot]"
             git config --global user.email "github-actions[bot]@users.noreply.github.com"
             git add posts.txt
