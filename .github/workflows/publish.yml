@@ -29,7 +29,8 @@ jobs:
           CAPTION=$(echo "$FIRST_LINE" | cut -d'|' -f2-)
 
           echo "Downloading image from: $PHOTO_URL"
-          curl -s -L "$PHOTO_URL" -o temp_image.jpg
+          # Добавили User-Agent, чтобы Unsplash не блокировал загрузку
+          curl -s -L -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36" "$PHOTO_URL" -o temp_image.jpg
 
           if [ ! -s "temp_image.jpg" ]; then
             echo "ERROR: Failed to download image!"
