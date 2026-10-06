@@ -17,7 +17,9 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
         run: |
-          TREND_CHOICE=$(( (RANDOM % 18) + 1 ))
+          # Используем криптостойкий генератор /dev/urandom, чтобы число реально менялось каждый запуск
+          TREND_CHOICE=$(( ($(od -An -N2 -i /dev/urandom) % 18) + 1 ))
+          echo "Selected post index: $TREND_CHOICE"
 
           case $TREND_CHOICE in
             1) 
