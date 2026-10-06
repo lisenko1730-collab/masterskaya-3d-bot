@@ -50,7 +50,7 @@ jobs:
               ;;
             8) 
               PHOTO_URL="https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1000"
-              CAPTION="🏢 PLA: Архитектурные панели и макетные элементы. [Открыть модель](https://www.printables.com/model/394102-architectural-wall-panel) | Есть выходы на архитекторов?" 
+              CAPTION="🏢 PLA: Подставка-сердечко для чашек (Coaster). [Открыть модель](https://www.printables.com/model/394102-heart-coaster) | Отличный сувенир?" 
               ;;
             9) 
               PHOTO_URL="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1000"
@@ -102,7 +102,6 @@ jobs:
 
           echo "Telegram Response: $RESPONSE"
           
-          # Проверяем, действительно ли Телеграм принял сообщение
           if echo "$RESPONSE" | grep -q '"ok":true'; then
             echo "Successfully sent to Telegram!"
           else
