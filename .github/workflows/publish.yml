@@ -79,7 +79,6 @@ jobs:
           with open(image_path, "rb") as f:
               img_bytes = f.read()
 
-          # Ручная сборка multipart/form-data без сторонних библиотек
           body = bytearray()
           for key, value in fields.items():
               body.extend(f'--{boundary}\r\n'.encode('utf-8'))
@@ -113,7 +112,6 @@ jobs:
               print(f"ERROR: Failed to send request: {e}")
               exit(1)
 
-          # Удаляем успешно опубликованный пост из очереди
           remaining_lines = lines[valid_idx + 1:]
           with open("posts.txt", "w", encoding="utf-8") as f:
               for line in remaining_lines:
