@@ -57,17 +57,15 @@ jobs:
           # Превращаем текстовые \n в реальные переносы строк для красивых абзацев
           caption = caption.replace("\\n", "\n")
 
-          # Формируем пост: текст с абзацами сверху, а ссылку прячем в невидимый символ для превью снизу
-          full_text = f"{caption}\n\n[​]({photo_url})"
+          print("Publishing photo post...")
 
-          print("Publishing post...")
-
-          url = f"https://api.telegram.org/bot{token}/sendMessage"
+          # Используем метод sendPhoto для гарантированной отправки с картинкой
+          url = f"https://api.telegram.org/bot{token}/sendPhoto"
           payload = {
               "chat_id": chat_id,
-              "text": full_text,
-              "parse_mode": "Markdown",
-              "disable_web_page_preview": False
+              "photo": photo_url,
+              "caption": caption,
+              "parse_mode": "Markdown"
           }
 
           data = json.dumps(payload).encode("utf-8")
