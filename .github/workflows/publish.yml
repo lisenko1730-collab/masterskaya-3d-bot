@@ -29,6 +29,7 @@ jobs:
           import urllib.request
           import json
           import urllib.error
+          import uuid
 
           token = os.environ["TELEGRAM_TOKEN"]
           chat_id = os.environ["TELEGRAM_TO"]
@@ -55,18 +56,48 @@ jobs:
           photo_url, caption = first_line.split("|", 1)
           caption = caption.replace("\\n", "\n")
 
-          print("Publishing photo post...")
+          print(f"Downloading image from {photo_url}...")
+          image_path = "temp_image.jpg"
+          try:
+              req_img = urllib.request.Request(photo_url, headers={'User-Agent': 'Mozilla/5.0'})
+              with urllib.request.urlopen(req_img) as response, open(image_path, 'wb') as out_file:
+                  out_file.write(response.read())
+          except Exception as e:
+              print(f"ERROR: Failed to download image: {e}")
+              exit(1)
 
+          print("Publishing photo post via multipart upload...")
           url = f"https://api.telegram.org/bot{token}/sendPhoto"
-          payload = {
+          
+          boundary = uuid.uuid4().hex
+          fields = {
               "chat_id": chat_id,
-              "photo": photo_url,
               "caption": caption,
               "parse_mode": "Markdown"
           }
+          
+          with open(image_path, "rb") as f:
+              img_bytes = f.read()
 
-          data = json.dumps(payload).encode("utf-8")
-          req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+          # Ручная сборка multipart/form-data без сторонних библиотек
+          body = bytearray()
+          for key, value in fields.items():
+              body.extend(f'--{boundary}\r\n'.encode('utf-8'))
+              body.extend(f'Content-Disposition: form-data; name="{key}"\r\n\r\n'.encode('utf-8'))
+              body.extend(f'{value}\r\n'.encode('utf-8'))
+
+          body.extend(f'--{boundary}\r\n'.encode('utf-8'))
+          body.extend(f'Content-Disposition: form-data; name="photo"; filename="image.jpg"\r\n'.encode('utf-8'))
+          body.extend(f'Content-Type: image/jpeg\r\n\r\n'.encode('utf-8'))
+          body.extend(img_bytes)
+          body.extend(b'\r\n')
+          body.extend(f'--{boundary}--\r\n'.encode('utf-8'))
+
+          headers = {
+              "Content-Type": f"multipart/form-data; boundary={boundary}"
+          }
+
+          req = urllib.request.Request(url, data=bytes(body), headers=headers)
 
           try:
               with urllib.request.urlopen(req) as response:
@@ -82,6 +113,7 @@ jobs:
               print(f"ERROR: Failed to send request: {e}")
               exit(1)
 
+          # Удаляем успешно опубликованный пост из очереди
           remaining_lines = lines[valid_idx + 1:]
           with open("posts.txt", "w", encoding="utf-8") as f:
               for line in remaining_lines:
