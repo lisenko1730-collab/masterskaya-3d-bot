@@ -39,7 +39,6 @@ jobs:
           with open("posts.txt", "r", encoding="utf-8") as f:
               lines = [line.strip() for line in f.readlines()]
 
-          # Находим первую непустую строку с валидным форматом
           valid_idx = -1
           first_line = ""
           for i, line in enumerate(lines):
@@ -53,8 +52,11 @@ jobs:
               exit(1)
 
           photo_url, caption = first_line.split("|", 1)
+          
+          # Заменяем литералы \n на реальные переносы строк для красивого форматирования
           caption = caption.replace("\\n", "\n")
 
+          # Собираем красивый пост: текст сверху, отступ, и внизу ссылка для превью картинки
           full_text = f"{caption}\n\n{photo_url}"
 
           print("Publishing post...")
@@ -81,7 +83,6 @@ jobs:
               print(f"ERROR: Failed to send request: {e}")
               exit(1)
 
-          # Удаляем обработанный пост и все пустые строки выше него
           remaining_lines = lines[valid_idx + 1:]
           with open("posts.txt", "w", encoding="utf-8") as f:
               for line in remaining_lines:
