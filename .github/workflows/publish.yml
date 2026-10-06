@@ -17,7 +17,7 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
         run: |
-          # Массив постов: каждая строка содержит четкую пару "Картинка|Текст с правильной ссылкой"
+          # Массив постов: жесткая связка "Картинка | Текст + Точная ссылка"
           POSTS=(
             "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=1000|🔥 Тренд (PLA/PETG): Модульный органайзер для рабочего стола. [Открыть модель](https://www.printables.com/model/525695-ultimate-drawer-organizer) | Запускаем в печать?"
             "https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=1000|🚀 Инженерка (TPU): Гибкий и прочный защитный чехол. [Открыть модель](https://www.printables.com/model/481203-tpu-phone-bumper-case) | Какая скорость печати под наш TPU?"
@@ -25,7 +25,7 @@ jobs:
             "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1000|🛠 Инженерка (PLA/PETG): Заглушка для карниза и датчика умного дома. [Открыть модель](https://www.printables.com/model/298412-curtain-rail-plug-and-sensor-mount) | Полезная фурнитура?"
             "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=1000|🌿 Эко-декор (PLA): Стильное кашпо со сложными гранями. [Открыть модель](https://www.printables.com/model/63972-low-poly-planter) | Пробуем эко-стиль?"
             "https://images.unsplash.com/photo-1581092335397-9583fe92d232?w=1000|🛡 TPU: Виброизоляционные демпферы под ножки принтера. [Открыть модель](https://www.printables.com/model/119934-anti-vibration-feet-for-prusa-i3-mk3s-mini-and-oth) | Тестируем усадку на мягком?"
-            "https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=1000|🧴 PETG/PLA: Сменная крышка-дозатор для диспенсера Sagrotan. [Открыть модель](https://www.printables.com/model/131920-soap-dispenser-pump) | Полезная бытовая мелочь?"
+            "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?w=1000|🧴 PETG/PLA: Сменная крышка-дозатор для диспенсера Sagrotan. [Открыть модель](https://www.printables.com/model/131920-soap-dispenser-pump) | Полезная бытовая мелочь?"
             "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1000|🏢 PLA: Архитектурные панели и макетные элементы. [Открыть модель](https://www.printables.com/model/77245-parametric-voronoi-coaster-or-wall-art) | Есть выходы на архитекторов?"
             "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1000|🚗 PETG: Автомобильный крючок-клипса для сумок в салон. [Открыть модель](https://www.printables.com/model/152841-car-headrest-hook-universal) | Кому из водителей актуально?"
             "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=1000|🌱 PLA/PETG: Настенный эргономичный держатель для роутера. [Открыть модель](https://www.printables.com/model/284102-universal-router-wall-mount) | Запустим серию?"
@@ -39,11 +39,11 @@ jobs:
             "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=1000|🤝 Синергия команды: Один моделирует, второй настраивает термопрофиль, третий закрывает сбыт. Как распределим задачи для следующего крупного проекта?"
           )
 
-          # Честно выбираем случайный индекс с помощью /dev/urandom
+          # Честный случайный выбор через /dev/urandom
           TOTAL_POSTS=${#POSTS[@]}
           RANDOM_INDEX=$(( $(od -An -N2 -i /dev/urandom) % TOTAL_POSTS ))
           
-          # Достаем выбранную строку и разделяем на картинку и текст
+          # Разделяем выбранную строку на картинку и текст
           SELECTED="${POSTS[$RANDOM_INDEX]}"
           PHOTO_URL="${SELECTED%%|*}"
           CAPTION="${SELECTED#*|}"
