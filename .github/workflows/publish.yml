@@ -17,29 +17,81 @@ jobs:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
         run: |
-          RANDOM_ID=$((RANDOM % 1000))
-          PHOTO_URL="https://picsum.photos/seed/${RANDOM_ID}/1000/1000"
           TREND_CHOICE=$(( (RANDOM % 18) + 1 ))
 
           case $TREND_CHOICE in
-            1) CAPTION="🔥 Тренд (PLA/PETG): Модульный органайзер для рабочего стола. [Открыть модель](https://www.printables.com/model/525695-ultimate-drawer-organizer) | Запускаем в печать?" ;;
-            2) CAPTION="🚀 Инженерка (TPU): Гибкий и прочный защитный чехол. [Открыть модель](https://www.printables.com/model/481203-tpu-phone-bumper-case) | Какая скорость печати под наш TPU?" ;;
-            3) CAPTION="⚙️ PETG: Прочная силовая шестеренка для механизма. [Открыть модель](https://www.printables.com/model/188452-strong-spur-gear) | Печатаем сразу из PETG?" ;;
-            4) CAPTION="🛠 Инженерка (PLA/PETG): Заглушка для карниза и датчика умного дома. [Открыть модель](https://www.printables.com/model/298412-curtain-rail-plug-and-sensor-mount) | Полезная фурнитура?" ;;
-            5) CAPTION="🌿 Эко-декор (PLA): Стильное кашпо со сложными гранями. [Открыть модель](https://www.printables.com/model/451234-low-poly-planter) | Пробуем эко-стиль?" ;;
-            6) CAPTION="🛡 TPU: Виброизоляционные демпферы под ножки принтера. [Открыть модель](https://www.printables.com/model/324910-tpu-printer-feet-dampers) | Тестируем усадку на мягком?" ;;
-            7) CAPTION="🧴 PETG/PLA: Сменная крышка-дозатор для диспенсера Sagrotan. [Открыть модель](https://www.printables.com/model/284102-sagrotan-dentol-nachfull-deckel) | Полезная бытовая мелочь?" ;;
-            8) CAPTION="🏢 PLA: Архитектурные панели и макетные элементы. [Открыть модель](https://www.printables.com/model/394102-architectural-wall-panel) | Есть выходы на архитекторов?" ;;
-            9) CAPTION="🚗 PETG: Автомобильный крючок-клипса для сумок в салон. [Открыть модель](https://www.printables.com/model/394819-car-headrest-hook) | Кому из водителей актуально?" ;;
-            10) CAPTION="🌱 PLA/PETG: Настенный эргономичный держатель для роутера. [Открыть модель](https://www.printables.com/model/123984-wall-mount-router-holder) | Запустим серию?" ;;
-            11) CAPTION="🍳 PETG: Подставка и организатор под крышки для кастрюль. [Открыть модель](https://www.printables.com/model/198273-pot-lid-holder) | Какую проблему кухни решим?" ;;
-            12) CAPTION="🔧 PETG: Держатель под инструмент для перфопанели. [Открыть модель](https://www.printables.com/model/502819-pegboard-pliers-holder) | Переделываем стеллажи?" ;;
-            13) CAPTION="🐾 PLA: Двойная приподнятая миска для домашних животных. [Открыть модель](https://www.printables.com/model/284719-elevated-pet-bowl-stand) | У кого питомцы протестируют?" ;;
-            14) CAPTION="🎁 PLA/PETG: Брендированная настольная подставка для визиток. [Открыть модель](https://www.printables.com/model/319402-business-card-holder) | Делаем под заказ?" ;;
-            15) CAPTION="⚡️️ PETG: Угловые мебельные крепежи повышенной прочности. [Открыть модель](https://www.printables.com/model/419203-heavy-duty-corner-bracket) | Насколько востребовано?" ;;
-            16) CAPTION="💪 Бизнес-фокус: От хобби к цеху. Как нашей тройке превратить разовые заказы в поток серийного производства? Обсуждаем стратегию масштабирования!" ;;
-            17) CAPTION="🎯 Инженерный рост: Каждая неудачная печать и отлипший слой — это не брак, а калибровка опыта. Какой сложный узел победим на этой неделе?" ;;
-            18) CAPTION="🤝 Синергия команды: Один моделирует, второй настраивает термопрофиль, третий закрывает сбыт. Как распределим задачи для следующего крупного проекта?" ;;
+            1) 
+              PHOTO_URL="https://images.printables.com/media/prints/525695/images/4298123_e1234.jpg"
+              CAPTION="🔥 Тренд (PLA/PETG): Модульный органайзер для рабочего стола. [Открыть модель](https://www.printables.com/model/525695-ultimate-drawer-organizer) | Запускаем в печать?" 
+              ;;
+            2) 
+              PHOTO_URL="https://images.printables.com/media/prints/481203/images/3891024_f5678.jpg"
+              CAPTION="🚀 Инженерка (TPU): Гибкий и прочный защитный чехол. [Открыть модель](https://www.printables.com/model/481203-tpu-phone-bumper-case) | Какая скорость печати под наш TPU?" 
+              ;;
+            3) 
+              PHOTO_URL="https://images.printables.com/media/prints/188452/images/1651859_gear.jpg"
+              CAPTION="⚙️ PETG: Прочная силовая шестеренка для механизма. [Открыть модель](https://www.printables.com/model/188452-strong-spur-gear) | Печатаем сразу из PETG?" 
+              ;;
+            4) 
+              PHOTO_URL="https://images.printables.com/media/prints/298412/images/2451029_plug.jpg"
+              CAPTION="🛠 Инженерка (PLA/PETG): Заглушка для карниза и датчика умного дома. [Открыть модель](https://www.printables.com/model/298412-curtain-rail-plug-and-sensor-mount) | Полезная фурнитура?" 
+              ;;
+            5) 
+              PHOTO_URL="https://images.printables.com/media/prints/451234/images/3621948_planter.jpg"
+              CAPTION="🌿 Эко-декор (PLA): Стильное кашпо со сложными гранями. [Открыть модель](https://www.printables.com/model/451234-low-poly-planter) | Пробуем эко-стиль?" 
+              ;;
+            6) 
+              PHOTO_URL="https://images.printables.com/media/prints/324910/images/2781920_feet.jpg"
+              CAPTION="🛡 TPU: Виброизоляционные демпферы под ножки принтера. [Открыть модель](https://www.printables.com/model/324910-tpu-printer-feet-dampers) | Тестируем усадку на мягком?" 
+              ;;
+            7) 
+              PHOTO_URL="https://images.printables.com/media/prints/284102/images/2391029_deckel.jpg"
+              CAPTION="🧴 PETG/PLA: Сменная крышка-дозатор для диспенсера Sagrotan. [Открыть модель](https://www.printables.com/model/284102-sagrotan-dentol-nachfull-deckel) | Полезная бытовая мелочь?" 
+              ;;
+            8) 
+              PHOTO_URL="https://images.printables.com/media/prints/394102/images/3192049_panel.jpg"
+              CAPTION="🏢 PLA: Архитектурные панели и макетные элементы. [Открыть модель](https://www.printables.com/model/394102-architectural-wall-panel) | Есть выходы на архитекторов?" 
+              ;;
+            9) 
+              PHOTO_URL="https://images.printables.com/media/prints/394819/images/3201948_hook.jpg"
+              CAPTION="🚗 PETG: Автомобильный крючок-клипса для сумок в салон. [Открыть модель](https://www.printables.com/model/394819-car-headrest-hook) | Кому из водителей актуально?" 
+              ;;
+            10) 
+              PHOTO_URL="https://images.printables.com/media/prints/123984/images/1029384_router.jpg"
+              CAPTION="🌱 PLA/PETG: Настенный эргономичный держатель для роутера. [Открыть модель](https://www.printables.com/model/123984-wall-mount-router-holder) | Запустим серию?" 
+              ;;
+            11) 
+              PHOTO_URL="https://images.printables.com/media/prints/198273/images/1729384_lid.jpg"
+              CAPTION="🍳 PETG: Подставка и организатор под крышки для кастрюль. [Открыть модель](https://www.printables.com/model/198273-pot-lid-holder) | Какую проблему кухни решим?" 
+              ;;
+            12) 
+              PHOTO_URL="https://images.printables.com/media/prints/502819/images/4092819_peg.jpg"
+              CAPTION="🔧 PETG: Держатель под инструмент для перфопанели. [Открыть модель](https://www.printables.com/model/502819-pegboard-pliers-holder) | Переделываем стеллажи?" 
+              ;;
+            13) 
+              PHOTO_URL="https://images.printables.com/media/prints/284719/images/2394819_pet.jpg"
+              CAPTION="🐾 PLA: Двойная приподнятая миска для домашних животных. [Открыть модель](https://www.printables.com/model/284719-elevated-pet-bowl-stand) | У кого питомцы протестируют?" 
+              ;;
+            14) 
+              PHOTO_URL="https://images.printables.com/media/prints/319402/images/2691029_card.jpg"
+              CAPTION="🎁 PLA/PETG: Брендированная настольная подставка для визиток. [Открыть модель](https://www.printables.com/model/319402-business-card-holder) | Делаем под заказ?" 
+              ;;
+            15) 
+              PHOTO_URL="https://images.printables.com/media/prints/419203/images/3491029_bracket.jpg"
+              CAPTION="⚡ PETG: Угловые мебельные крепежи повышенной прочности. [Открыть модель](https://www.printables.com/model/419203-heavy-duty-corner-bracket) | Насколько востребовано?" 
+              ;;
+            16) 
+              PHOTO_URL="https://images.printables.com/media/prints/525695/images/4298123_e1234.jpg"
+              CAPTION="💪 Бизнес-фокус: От хобби к цеху. Как нашей тройке превратить разовые заказы в поток серийного производства? Обсуждаем стратегию масштабирования!" 
+              ;;
+            17) 
+              PHOTO_URL="https://images.printables.com/media/prints/188452/images/1651859_gear.jpg"
+              CAPTION="🎯 Инженерный рост: Каждая неудачная печать и отлипший слой — это не брак, а калибровка опыта. Какой сложный узел победим на этой неделе?" 
+              ;;
+            18) 
+              PHOTO_URL="https://images.printables.com/media/prints/481203/images/3891024_f5678.jpg"
+              CAPTION="🤝 Синергия команды: Один моделирует, второй настраивает термопрофиль, третий закрывает сбыт. Как распределим задачи для следующего крупного проекта?" 
+              ;;
           esac
 
           curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
