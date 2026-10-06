@@ -1,4 +1,4 @@
-name: Publish to Telegram Channel (Preview Card)
+name: Publish to Telegram Channel (Python Queue)
 
 on:
   schedule:
@@ -14,46 +14,84 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Send post to Telegram
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Publish post to Telegram
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
         run: |
-          if [ ! -f "posts.txt" ] || [ ! -s "posts.txt" ]; then
-            echo "ERROR: posts.txt is missing or empty!"
-            exit 1
-          fi
+          python3 - << 'EOF'
+          import os
+          import urllib.request
+          import json
 
-          FIRST_LINE=$(head -n 1 posts.txt)
-          PHOTO_URL=$(echo "$FIRST_LINE" | cut -d'|' -f1)
-          CAPTION=$(echo "$FIRST_LINE" | cut -d'|' -f2-)
+          token = os.environ["TELEGRAM_TOKEN"]
+          chat_id = os.environ["TELEGRAM_TO"]
 
-          # Собираем текст, где картинка идет в самом низу или вверху с описанием
-          FULL_TEXT="$CAPTION"$'\n\n'"$PHOTO_URL"
+          # Читаем файл очереди
+          if not os.path.exists("posts.txt") or os.path.getsize("posts.txt") == 0:
+              print("ERROR: posts.txt is missing or empty!")
+              exit(1)
 
-          echo "Publishing post..."
+          with open("posts.txt", "r", encoding="utf-8") as f:
+              lines = f.readlines()
 
-          RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
-            -d "chat_id=$TELEGRAM_TO" \
-            -d "parse_mode=Markdown" \
-            -d "disable_web_page_preview=false" \
-            -d "text=$FULL_TEXT")
+          if not lines:
+              print("ERROR: No posts left!")
+              exit(1)
 
-          echo "Telegram Response: $RESPONSE"
-          
-          if echo "$RESPONSE" | grep -q '"ok":true'; then
-            echo "Successfully sent to Telegram!"
-            
-            # Удаляем первую строку из файла
-            sed -i '1d' posts.txt
-            
-            # Сохраняем изменения в репозиторий
-            git config --global user.name "github-actions[bot]"
-            git config --global user.email "github-actions[bot]@users.noreply.github.com"
-            git add posts.txt
-            git commit -m "Auto: remove published post from queue"
-            git push
-          else
-            echo "ERROR: Failed to send to Telegram!"
-            exit 1
-          fi
+          # Берем первую строку (первый пост)
+          first_line = lines[0].strip()
+          if "|" not in first_line:
+              print("ERROR: Invalid post format!")
+              exit(1)
+
+          photo_url, caption = first_line.split("|", 1)
+          # Заменяем реальные переносы строк, если они были записаны как литералы \n
+          caption = caption.replace("\\n", "\n")
+
+          # Формируем текст сообщения со ссылкой на превью картинки внизу
+          full_text = f"{caption}\n\n{photo_url}"
+
+          print("Publishing post...")
+
+          url = f"https://api.telegram.org/bot{token}/sendMessage"
+          payload = {
+              "chat_id": chat_id,
+              "text": full_text,
+              "parse_mode": "Markdown",
+              "disable_web_page_preview": False
+          }
+
+          data = json.dumps(payload).encode("utf-8")
+          req = urllib.request.Request(url, data=data, headers={'Content-Type': 'application/json'})
+
+          try:
+              with urllib.request.urlopen(req) as response:
+                  res_body = json.loads(response.read().decode("utf-8"))
+                  print("Telegram Response:", res_body)
+                  if not res_body.get("ok"):
+                      print("ERROR: Telegram API returned false!")
+                      exit(1)
+          except Exception as e:
+              print(f"ERROR: Failed to send request: {e}")
+              exit(1)
+
+          # Удаляем отправленный пост из файла очереди
+          with open("posts.txt", "w", encoding="utf-8") as f:
+              f.writelines(lines[1:])
+
+          print("Successfully sent and queue updated!")
+          EOF
+
+      - name: Commit changes to queue
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add posts.txt
+          git commit -m "Auto: remove published post from queue" || echo "No changes to commit"
+          git push
