@@ -1,4 +1,4 @@
-name: Publish to Telegram Channel (Text + Link)
+name: Publish to Telegram Channel (Photo + Caption)
 
 on:
   schedule:
@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Send message to Telegram
+      - name: Send photo and caption to Telegram
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
@@ -28,15 +28,21 @@ jobs:
           PHOTO_URL=$(echo "$FIRST_LINE" | cut -d'|' -f1)
           CAPTION=$(echo "$FIRST_LINE" | cut -d'|' -f2-)
 
-          # Формируем текст сообщения со ссылкой на картинку в начале
-          FULL_TEXT="$PHOTO_URL"$'\n\n'"$CAPTION"
+          echo "Downloading image from: $PHOTO_URL"
+          curl -s -L "$PHOTO_URL" -o temp_image.jpg
 
-          echo "Publishing post..."
+          if [ ! -s "temp_image.jpg" ]; then
+            echo "ERROR: Failed to download image!"
+            exit 1
+          fi
 
-          RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendMessage" \
-            -d "chat_id=$TELEGRAM_TO" \
-            -d "parse_mode=Markdown" \
-            -d "text=$FULL_TEXT")
+          echo "Publishing post with photo..."
+
+          RESPONSE=$(curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_TOKEN/sendPhoto" \
+            -F "chat_id=$TELEGRAM_TO" \
+            -F "photo=@temp_image.jpg" \
+            -F "caption=$CAPTION" \
+            -F "parse_mode=Markdown")
 
           echo "Telegram Response: $RESPONSE"
           
