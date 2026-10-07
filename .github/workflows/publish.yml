@@ -43,27 +43,35 @@ jobs:
 
           valid_idx = -1
           first_line = ""
-          for i, line in enumerate(lines):
-              if line and "|" in line:
-                  valid_idx = i
-                  first_line = line
-                  break
-
-          if valid_idx == -1:
-              print("ERROR: No valid posts found in posts.txt!")
-              exit(1)
-
-          photo_url, caption = first_line.split("|", 1)
-          caption = caption.replace("\\n", "\n")
-
-          print(f"Downloading image from {photo_url}...")
           image_path = "temp_image.jpg"
-          try:
-              req_img = urllib.request.Request(photo_url, headers={'User-Agent': 'Mozilla/5.0'})
-              with urllib.request.urlopen(req_img) as response, open(image_path, 'wb') as out_file:
-                  out_file.write(response.read())
-          except Exception as e:
-              print(f"ERROR: Failed to download image: {e}")
+
+          # Ищем первый рабочий пост (пропускаем битые ссылки с 404)
+          while lines:
+              candidate = lines.pop(0)
+              if not candidate or "|" not in candidate:
+                  continue
+              
+              p_url, p_cap = candidate.split("|", 1)
+              print(f"Trying image from {p_url}...")
+              
+              try:
+                  req_img = urllib.request.Request(p_url, headers={'User-Agent': 'Mozilla/5.0'})
+                  with urllib.request.urlopen(req_img) as response, open(image_path, 'wb') as out_file:
+                      out_file.write(response.read())
+                  # Если скачалось успешно — фиксируем успех
+                  first_line = candidate
+                  caption = p_cap.replace("\\n", "\n")
+                  valid_idx = True
+                  break
+              except urllib.error.HTTPError as e:
+                  print(f"WARNING: Image link returned HTTP Error {e.code}. Skipping to next...")
+                  continue
+              except Exception as e:
+                  print(f"WARNING: Failed to download image: {e}. Skipping to next...")
+                  continue
+
+          if not valid_idx:
+              print("ERROR: No valid/working posts found in posts.txt!")
               exit(1)
 
           print("Publishing photo post via multipart upload...")
@@ -112,9 +120,9 @@ jobs:
               print(f"ERROR: Failed to send request: {e}")
               exit(1)
 
-          remaining_lines = lines[valid_idx + 1:]
+          # Сохраняем оставшиеся строки (битая ссылка удалена навсегда)
           with open("posts.txt", "w", encoding="utf-8") as f:
-              for line in remaining_lines:
+              for line in lines:
                   f.write(line + "\n")
 
           print("Successfully sent and queue updated!")
@@ -125,5 +133,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add posts.txt
-          git commit -m "Auto: remove published post from queue" || echo "No changes to commit"
+          git commit -m "Auto: remove published post and clean broken links" || echo "No changes to commit"
           git push
