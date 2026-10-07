@@ -39,7 +39,7 @@ jobs:
               print("ERROR: TELEGRAM_BOT_TOKEN or TELEGRAM_TO is not set!")
               sys.exit(1)
 
-          # Развернутые, информативные посты без сбоев форматирования
+          # Развернутые, информативные посты
           default_posts = [
               (
                   "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1000",
@@ -71,20 +71,22 @@ jobs:
               )
           ]
 
+          def write_default_posts(filename):
+              with open(filename, "w", encoding="utf-8") as f:
+                  for img, cap in default_posts:
+                      escaped_cap = cap.replace("\n", "\\n")
+                      f.write(f"{img}|{escaped_cap}\n")
+
           if not os.path.exists("posts.txt"):
               print("posts.txt not found, creating with rich posts...")
-              with open("posts.txt", "w", encoding="utf-8") as f:
-                  for img, cap in default_posts:
-                      f.write(f"{img}|{cap.replace(chr(10), '\\n')}\n")
+              write_default_posts("posts.txt")
 
           with open("posts.txt", "r", encoding="utf-8") as f:
               lines = [line.strip() for line in f.readlines() if line.strip()]
 
           if not lines:
               print("posts.txt was empty, repopulating...")
-              with open("posts.txt", "w", encoding="utf-8") as f:
-                  for img, cap in default_posts:
-                      f.write(f"{img}|{cap.replace(chr(10), '\\n')}\n")
+              write_default_posts("posts.txt")
               with open("posts.txt", "r", encoding="utf-8") as f:
                   lines = [line.strip() for line in f.readlines() if line.strip()]
 
@@ -121,14 +123,13 @@ jobs:
                   out_file.write(response.read())
               caption = p_cap
 
-          print("Preparing request for Telegram (plain text mode to avoid formatting drops)...")
+          print("Preparing request for Telegram...")
           url = f"https://api.telegram.org/bot{token}/sendPhoto"
           
           boundary = uuid.uuid4().hex
           fields = {
               "chat_id": chat_id,
               "caption": caption
-              # Убрали parse_mode, теперь текст гарантированно не оборвется из-за символов разметки
           }
           
           with open(image_path, "rb") as f:
