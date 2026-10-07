@@ -1,4 +1,4 @@
-name: Publish to Telegram Channel (Index Rotation)
+name: Publish to Telegram Channel (Randomized)
 
 on:
   schedule:
@@ -18,7 +18,6 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_TO: "@master_3d_workshop"
-          RUN_NUMBER: ${{ github.run_number }}
         run: |
           python3 - << 'EOF'
           import os
@@ -26,16 +25,17 @@ jobs:
           import json
           import uuid
           import sys
+          import time
+          import random
 
           token = os.environ.get("TELEGRAM_TOKEN")
           chat_id = os.environ.get("TELEGRAM_TO")
-          run_number = int(os.environ.get("RUN_NUMBER", 1))
 
           if not token or not chat_id:
               print("ERROR: TELEGRAM_BOT_TOKEN or TELEGRAM_TO is not set!")
               sys.exit(1)
 
-          # Список уникальных постов (без истории, только технологии, эрудиция и мотивация)
+          # Большой пул разнообразных постов (без повторов и истории)
           posts = [
               (
                   "https://images.unsplash.com/photo-1457369804613-52c61a468e7d?w=1000",
@@ -64,17 +64,30 @@ jobs:
                   "Рутина убивает творчество. Когда большую часть времени приходится тратить на однотипные действия, на рождение новых идей сил уже не остается.\n\n"
                   "Именно поэтому оптимизация процессов — будь то автоматизация задач через скрипты или организация рабочего пространства — лучший шаг для любого мастера.\n\n"
                   "💬 А какой рутинный процесс вы бы хотели автоматизировать в первую очередь?"
+              ),
+              (
+                  "https://images.unsplash.com/photo-1531482615713-2afd69097998?w=1000",
+                  "🎯 Фокус и глубина погружения в задачу\n\n"
+                  "Современный мир полон отвлекающих факторов: уведомления, мессенджеры и бесконечный поток информации дробят наше внимание на мелкие кусочки.\n\n"
+                  "Способность погрузиться в сложную инженерную или творческую задачу на 2-3 часа без перерывов — это редкий и самый ценный навык цифровой эпохи.\n\n"
+                  "💬 А как вы боретесь с отвлекающими факторами во время работы?"
+              ),
+              (
+                  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1000",
+                  "⚙️ Инженерный подход к повседневным задачам\n\n"
+                  "Инженер — это не просто профессия, это склад ума. Умение разбить сложную проблему на простые модули, найти узкие места и протестировать гипотезы работает абсолютно в любой сфере жизни.\n\n"
+                  "Системный подход избавляет от хаоса и позволяет находить элегантные решения там, где другие сдаются.\n\n"
+                  "💬 Применяете ли вы инженерные принципы вне работы?"
               )
           ]
 
-          # Жестко выбираем пост по кругу на основе номера запуска GitHub Actions
-          index = (run_number - 1) % len(posts)
-          p_url, caption = posts[index]
+          # Используем текущее время как сид для генератора случайных чисел
+          random.seed(time.time())
+          p_url, caption = random.choice(posts)
           image_path = "temp_image.jpg"
 
-          print(f"Selected post index {index} (Run #{run_number}) with image: {p_url}")
+          print(f"Selected unique post with image: {p_url}")
 
-          # Скачиваем картинку с проверкой
           try:
               req_img = urllib.request.Request(p_url, headers={'User-Agent': 'Mozilla/5.0'})
               with urllib.request.urlopen(req_img, timeout=15) as response, open(image_path, 'wb') as out_file:
