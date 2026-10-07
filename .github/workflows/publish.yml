@@ -30,52 +30,60 @@ jobs:
           import json
           import urllib.error
           import uuid
+          import sys
 
-          token = os.environ["TELEGRAM_TOKEN"]
-          chat_id = os.environ["TELEGRAM_TO"]
+          token = os.environ.get("TELEGRAM_TOKEN")
+          chat_id = os.environ.get("TELEGRAM_TO")
+
+          if not token or not chat_id:
+              print("ERROR: TELEGRAM_BOT_TOKEN or TELEGRAM_TO is not set!")
+              sys.exit(1)
 
           if not os.path.exists("posts.txt"):
               print("ERROR: posts.txt is missing!")
-              exit(1)
+              sys.exit(1)
 
           with open("posts.txt", "r", encoding="utf-8") as f:
-              lines = [line.strip() for line in f.readlines()]
+              lines = [line.strip() for line in f.readlines() if line.strip()]
+
+          if not lines:
+              print("ERROR: posts.txt is empty!")
+              sys.exit(1)
 
           found_post = False
-          first_line = ""
           caption = ""
           image_path = "temp_image.jpg"
 
-          # Ищем первый рабочий пост (пропускаем битые ссылки с 404)
+          # Ищем первый рабочий пост, попутно отсеивая битые ссылки
           while lines:
               candidate = lines.pop(0)
-              if not candidate or "|" not in candidate:
+              if "|" not in candidate:
+                  print(f"WARNING: Invalid line format (missing '|'), skipping: {candidate}")
                   continue
               
               p_url, p_cap = candidate.split("|", 1)
-              print(f"Trying image from {p_url}...")
+              print(f"Trying image from: {p_url}")
               
               try:
                   req_img = urllib.request.Request(p_url, headers={'User-Agent': 'Mozilla/5.0'})
-                  with urllib.request.urlopen(req_img) as response, open(image_path, 'wb') as out_file:
+                  with urllib.request.urlopen(req_img, timeout=15) as response, open(image_path, 'wb') as out_file:
                       out_file.write(response.read())
-                  # Если скачалось успешно — фиксируем успех
-                  first_line = candidate
+                  
                   caption = p_cap.replace("\\n", "\n")
                   found_post = True
                   break
               except urllib.error.HTTPError as e:
-                  print(f"WARNING: Image link returned HTTP Error {e.code}. Skipping to next...")
+                  print(f"WARNING: Image link returned HTTP Error {e.code}. Removing from queue and trying next...")
                   continue
               except Exception as e:
-                  print(f"WARNING: Failed to download image: {e}. Skipping to next...")
+                  print(f"WARNING: Failed to download image due to {e}. Removing from queue and trying next...")
                   continue
 
           if not found_post:
-              print("ERROR: No valid/working posts found in posts.txt!")
-              exit(1)
+              print("ERROR: No valid/working posts found in posts.txt after checking all candidates!")
+              sys.exit(1)
 
-          print("Publishing photo post via multipart upload...")
+          print("Preparing multipart/form-data request for Telegram...")
           url = f"https://api.telegram.org/bot{token}/sendPhoto"
           
           boundary = uuid.uuid4().hex
@@ -85,8 +93,12 @@ jobs:
               "parse_mode": "Markdown"
           }
           
-          with open(image_path, "rb") as f:
-              img_bytes = f.read()
+          try:
+              with open(image_path, "rb") as f:
+                  img_bytes = f.read()
+          except Exception as e:
+              print(f"ERROR: Failed to read temporary image file: {e}")
+              sys.exit(1)
 
           body = bytearray()
           for key, value in fields.items():
@@ -108,25 +120,26 @@ jobs:
           req = urllib.request.Request(url, data=bytes(body), headers=headers)
 
           try:
-              with urllib.request.urlopen(req) as response:
+              with urllib.request.urlopen(req, timeout=15) as response:
                   res_body = json.loads(response.read().decode("utf-8"))
                   print("Telegram Response:", res_body)
                   if not res_body.get("ok"):
-                      print("ERROR: Telegram API returned false!")
-                      exit(1)
+                      print("ERROR: Telegram API rejected the post!")
+                      sys.exit(1)
           except urllib.error.HTTPError as e:
-              print(f"HTTP Error Details: {e.read().decode('utf-8')}")
-              exit(1)
+              err_details = e.read().decode('utf-8', errors='ignore')
+              print(f"HTTP Error Details: {err_details}")
+              sys.exit(1)
           except Exception as e:
-              print(f"ERROR: Failed to send request: {e}")
-              exit(1)
+              print(f"ERROR: Failed to send request to Telegram: {e}")
+              sys.exit(1)
 
-          # Сохраняем оставшиеся строки (опубликованный пост удален из очереди)
+          # Перезаписываем файл очереди, исключая успешно отправленный пост и все битые
           with open("posts.txt", "w", encoding="utf-8") as f:
               for line in lines:
                   f.write(line + "\n")
 
-          print("Successfully sent and queue updated!")
+          print("Successfully sent post and cleaned queue!")
           EOF
 
       - name: Commit changes to queue
@@ -134,5 +147,5 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add posts.txt
-          git commit -m "Auto: remove published post and clean broken links" || echo "No changes to commit"
+          git commit -m "Auto: remove published post and clean queue" || echo "No changes to commit"
           git push
