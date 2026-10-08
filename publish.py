@@ -2,11 +2,17 @@ import os
 import sys
 import json
 import time
+import random
 import pathlib
 
 import requests
 
 STATE_FILE = pathlib.Path("state.json")
+
+# Сколько последних индексов помнить, чтобы не повторяться.
+# 15 = не повторяться, пока не пройдёт весь пул (случайный порядок без повторов).
+# Поставьте, например, 10 — если хотите чуть больше вариативности с редкими повторами.
+RECENT_WINDOW = 15
 
 token = os.environ.get("TELEGRAM_TOKEN")
 chat_id = os.environ.get("TELEGRAM_TO")
@@ -81,15 +87,35 @@ POSTS = [
 
 def load_state() -> dict:
     if not STATE_FILE.exists():
-        return {"next_index": 0}
+        return {"recent": []}
     try:
-        return json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        data = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        if "recent" not in data:
+            data["recent"] = []
+        return data
     except Exception:
-        return {"next_index": 0}
+        return {"recent": []}
 
 
 def save_state(state: dict) -> None:
     STATE_FILE.write_text(json.dumps(state, indent=2), encoding="utf-8")
+
+
+def pick_index(recent: list) -> int:
+    total = len(POSTS)
+    window = min(RECENT_WINDOW, total)
+
+    # Индексы, которые "недавно" уже были
+    recent_set = set(recent[-window:]) if window > 0 else set()
+
+    # Все доступные для выбора
+    candidates = [i for i in range(total) if i not in recent_set]
+
+    # Если вдруг пул меньше окна и все уже "недавние" — просто выбираем из всех
+    if not candidates:
+        candidates = list(range(total))
+
+    return random.choice(candidates)
 
 
 def download_image(url: str) -> bytes:
@@ -109,11 +135,11 @@ def download_image(url: str) -> bytes:
     raise RuntimeError(f"Failed to download image: {last_err}")
 
 
-def send_photo(image_bytes: bytes, caption: str) -> None:
+def send_photo(image_bytes: bytes, caption: str, file_name: str) -> None:
     resp = requests.post(
         f"https://api.telegram.org/bot{token}/sendPhoto",
         data={"chat_id": chat_id, "caption": caption},
-        files={"photo": ("image.jpg", image_bytes, "image/jpeg")},
+        files={"photo": (file_name, image_bytes, "image/jpeg")},
         timeout=30,
     )
     print("Telegram HTTP:", resp.status_code)
@@ -125,18 +151,22 @@ def send_photo(image_bytes: bytes, caption: str) -> None:
 
 def main() -> None:
     state = load_state()
-    index = int(state.get("next_index", 0)) % len(POSTS)
+    recent = list(state.get("recent", []))
 
+    index = pick_index(recent)
     url, caption = POSTS[index]
-    print(f"Publishing post {index + 1}/{len(POSTS)}")
+    print(f"Random post picked: {index + 1}/{len(POSTS)}")
+    print(f"Recent history: {recent[-RECENT_WINDOW:]}")
     print(f"Image: {url}")
 
     image_bytes = download_image(url)
-    send_photo(image_bytes, caption)
+    send_photo(image_bytes, caption, file_name=f"image_{index}.jpg")
 
-    state["next_index"] = (index + 1) % len(POSTS)
+    recent.append(index)
+    # Храним только последние N, чтобы state.json не разрастался
+    state["recent"] = recent[-len(POSTS):]
     save_state(state)
-    print(f"Done. next_index={state['next_index']}")
+    print(f"Done. recent={state['recent']}")
 
 
 if __name__ == "__main__":
