@@ -2,8 +2,8 @@ name: Publish to Telegram Channel
 
 on:
   schedule:
-    # Публикация с 02:00 до 15:00 по UTC (с 09:00 до 22:00 по Новосибирску, UTC+7)
-    - cron: '0 2-15 * * *'
+    # Запуск каждые 30 минут с 02:00 до 15:00 UTC (соответствует 09:00 – 22:00 по Новосибирску)
+    - cron: '*/30 2-15 * * *'
   workflow_dispatch:
 
 concurrency:
