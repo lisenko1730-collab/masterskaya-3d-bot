@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import requests
 
 # Пул из 16 уникальных постов со стабильными картинками
@@ -72,6 +73,7 @@ POSTS = [
 
 STATE_FILE = "state.json"
 
+
 def get_current_index():
     if os.path.exists(STATE_FILE):
         try:
@@ -82,9 +84,26 @@ def get_current_index():
             return 0
     return 0
 
+
 def save_next_index(next_index):
     with open(STATE_FILE, "w", encoding="utf-8") as f:
         json.dump({"index": next_index}, f)
+
+
+def download_image(url, attempts=3):
+    """Скачивает картинку с повторными попытками. Возвращает bytes или None."""
+    for i in range(1, attempts + 1):
+        try:
+            r = requests.get(url, timeout=15)
+            if r.status_code == 200 and r.content:
+                return r.content
+            print(f"Попытка {i}/{attempts}: статус {r.status_code}")
+        except requests.RequestException as e:
+            print(f"Попытка {i}/{attempts}: ошибка {e}")
+        if i < attempts:
+            time.sleep(2 * i)
+    return None
+
 
 def main():
     token = os.environ.get("TELEGRAM_TOKEN")
@@ -99,27 +118,25 @@ def main():
         index = 0
 
     post = POSTS[index]
-    
-    img_url = post["photo"]
-    print(f"Downloading image from {img_url}...")
-    img_response = requests.get(img_url, timeout=15)
-    
-    if img_response.status_code != 200:
-        print(f"ERROR: Failed to download image, status code: {img_response.status_code}")
-        exit(1)
 
-    url = f"https://api.telegram.org/bot{token}/sendPhoto"
-    files = {
-        "photo": ("image.jpg", img_response.content, "image/jpeg")
-    }
-    data = {
-        "chat_id": chat_id,
-        "caption": post["caption"]
-    }
+    print(f"Downloading image from {post['photo']}...")
+    image = download_image(post["photo"])
 
-    response = requests.post(url, data=data, files=files, timeout=30)
+    if image:
+        url = f"https://api.telegram.org/bot{token}/sendPhoto"
+        files = {"photo": ("image.jpg", image, "image/jpeg")}
+        data = {"chat_id": chat_id, "caption": post["caption"]}
+        response = requests.post(url, data=data, files=files, timeout=30)
+        mode = "with photo"
+    else:
+        print("WARNING: image unavailable, sending text only")
+        url = f"https://api.telegram.org/bot{token}/sendMessage"
+        data = {"chat_id": chat_id, "text": post["caption"]}
+        response = requests.post(url, data=data, timeout=30)
+        mode = "text only"
+
     res_data = response.json()
-    
+
     print("Telegram Response:", res_data)
     if not res_data.get("ok"):
         print("ERROR: Telegram API rejected the post!")
@@ -127,7 +144,8 @@ def main():
 
     next_index = (index + 1) % len(POSTS)
     save_next_index(next_index)
-    print(f"Successfully published post index {index} with photo. Next index will be {next_index}.")
+    print(f"Successfully published post index {index} ({mode}). Next index will be {next_index}.")
+
 
 if __name__ == "__main__":
     main()
