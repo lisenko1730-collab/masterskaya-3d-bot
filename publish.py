@@ -112,7 +112,7 @@ MOTIVATION_POSTS = [
 ]
 
 # Посты про изделия для 3D-печати. image_query (по-английски) нужен, чтобы подобрать
-# картинку по теме поста. Для таких постов нужен бесплатный ключ PEXELS_API_KEY.
+# картинку по теме поста. Для таких постов нужен бесплатный ключ PIXABAY_API_KEY.
 TREND_POSTS = [
     {
         "caption": "🦎 Гибкие фигурки: игрушки, которые двигаются\n\nОдна из самых популярных идей среди любителей 3D-печати — подвижные дракончики, осьминоги и ящерицы. Они печатаются сразу целиком, а потом изгибаются и «оживают» в руках. Многоцветные версии с плавными переходами смотрятся особенно эффектно.\n\nТакая игрушка нравится и детям, и взрослым, а как антистресс работает не хуже магазинных.\n\n💬 Какого подвижного зверя вы бы хотели напечатать первым?",
@@ -186,7 +186,7 @@ POSTS = mix_posts(MOTIVATION_POSTS, TREND_POSTS, TREND_EVERY)
 
 STATE_FILE = "state.json"
 MAX_USED_PHOTOS = 60   # столько последних картинок помним, чтобы не повторять
-PEXELS_URL = "https://api.pexels.com/v1/search"
+PIXABAY_URL = "https://pixabay.com/api/"
 FALLBACK_QUERY = "3d printer"   # запасной запрос, если по теме поста ничего не нашлось
 
 
@@ -241,45 +241,56 @@ def download_random_image():
     return download_url(f"https://picsum.photos/seed/{seed}/1000/600")
 
 
-def find_pexels_photo(query, used_ids, api_key):
-    """Ищет на Pexels фото по теме. Возвращает словарь фото или None."""
+def find_pixabay_photo(query, used_ids, api_key):
+    """Ищет на Pixabay фото по теме. Возвращает {"id": ..., "url": ...} или None."""
     try:
         r = requests.get(
-            PEXELS_URL,
-            headers={"Authorization": api_key},
-            params={"query": query, "per_page": 15, "orientation": "landscape"},
+            PIXABAY_URL,
+            params={
+                "key": api_key,
+                "q": query[:100],
+                "image_type": "photo",
+                "orientation": "horizontal",
+                "safesearch": "true",
+                "per_page": 20,
+            },
             timeout=20,
         )
         if r.status_code != 200:
-            print(f"Pexels: статус {r.status_code}")
+            print(f"Pixabay: статус {r.status_code}")
             return None
-        photos = r.json().get("photos", [])
+        hits = r.json().get("hits", [])
     except (requests.RequestException, ValueError) as e:
-        print(f"Pexels: ошибка {e}")
+        print(f"Pixabay: ошибка {e}")
         return None
+    if not hits:
+        print(f"Pixabay: по запросу «{query}» ничего не найдено")
+        return None
+    photos = []
+    for h in hits:
+        url = h.get("largeImageURL") or h.get("webformatURL")
+        if url:
+            photos.append({"id": f"pixabay:{h.get('id')}", "url": url})
     if not photos:
-        print(f"Pexels: по запросу «{query}» ничего не найдено")
         return None
-    fresh = [p for p in photos if p.get("id") not in used_ids]
+    fresh = [p for p in photos if p["id"] not in used_ids]
     return random.choice(fresh or photos)
 
 
 def get_topic_image(query, used_ids):
     """Картинка по теме поста. Возвращает (bytes, id фото) или (None, None)."""
-    api_key = os.environ.get("PEXELS_API_KEY")
+    api_key = os.environ.get("PIXABAY_API_KEY")
     if not api_key:
-        print("WARNING: PEXELS_API_KEY не задан, картинку по теме подобрать нельзя")
+        print("WARNING: PIXABAY_API_KEY не задан, картинку по теме подобрать нельзя")
         return None, None
     queries = [query] if query == FALLBACK_QUERY else [query, FALLBACK_QUERY]
     for q in queries:
-        photo = find_pexels_photo(q, used_ids, api_key)
+        photo = find_pixabay_photo(q, used_ids, api_key)
         if not photo:
             continue
-        src = photo.get("src", {})
-        img_url = src.get("large") or src.get("original")
-        data = download_url(img_url) if img_url else None
+        data = download_url(photo["url"])
         if data:
-            return data, photo.get("id")
+            return data, photo["id"]
     return None, None
 
 
