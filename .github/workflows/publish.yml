@@ -3,9 +3,9 @@ name: Publish post
 on:
   schedule:
     # Время в UTC. Местное время (UTC+7) = UTC + 7 часов.
-    # Каждый час: с 02:00 до 15:00 UTC = с 9:00 до 22:00 по местному времени
-    - cron: '0 2-15 * * *'
-  workflow_dispatch:
+    # Один раз в день в 03:00 UTC = ровно 10:00 утра по местному времени
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Оставляем для ручного тестирования по кнопке
 
 permissions:
   contents: write
@@ -15,6 +15,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Рекомендую добавить эту строку, если у вас включена защита ветки (Branch Protection)
+          # token: ${{ secrets.PAT_TOKEN }} 
 
       - uses: actions/setup-python@v5
         with:
@@ -34,5 +37,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          # Добавляем pull --rebase на случай, если в репозитории появились другие изменения
+          git pull --rebase origin ${{ github.ref_name }}
           git add state.json
-          git diff --staged --quiet || (git commit -m "Update state" && git push)
+          git diff --staged --quiet || (git commit -m "chore: update state.json" && git push)
